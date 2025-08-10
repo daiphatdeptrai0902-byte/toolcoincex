@@ -1,2 +1,127 @@
-# toolcoincex
-Tool Coincex By Dai Phat
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>⚡ AI DỰ ĐOÁN COINCEX.IO by ĐẠI PHÁT ⚡</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+    body {
+        background-color: #0a0a1a;
+        color: white;
+        font-family: Consolas, monospace;
+        text-align: center;
+        padding-top: 20px;
+    }
+    h1 {
+        color: #00ffe1;
+        font-weight: bold;
+    }
+    #result {
+        font-size: 38px;
+        font-weight: bold;
+        margin-top: 15px;
+    }
+    .wait {
+        color: orange;
+        font-weight: bold;
+    }
+    .end {
+        color: #ff4d4d;
+    }
+    .next {
+        color: #999999;
+    }
+    #countdown {
+        color: #00ffff;
+        font-size: 20px;
+        font-weight: bold;
+        margin-top: 30px;
+    }
+    #username {
+        font-size: 18px;
+        margin-bottom: 15px;
+        color: #00ff99;
+    }
+</style>
+</head>
+<body>
+
+<h1>🚀 AI DỰ ĐOÁN COINCEX.IO</h1>
+<div id="username"></div>
+<div id="session"></div>
+<div id="wait" class="wait" style="display:none;">⌛ ĐANG PHÂN TÍCH...</div>
+<div id="result" style="display:none;"></div>
+<div id="end" class="end" style="display:none;">⚠️ HẾT THỜI GIAN ĐẶT LỆNH</div>
+<div id="next" class="next" style="display:none;">🕒 CHỜ PHIÊN SAU...</div>
+<div id="countdown"></div>
+
+<script>
+let tg = window.Telegram.WebApp;
+tg.expand();
+document.getElementById("username").innerText = 
+    "Xin chào, " + (tg.initDataUnsafe?.user?.first_name || "Nhà đầu tư") + "!";
+
+let resultShown = false;
+let analysisDuration = Math.floor(Math.random() * (24 - 15 + 1)) + 15;
+
+function getSessionTime(now) {
+    let startMinute = Math.floor(now.getMinutes() / 2) * 2;
+    let startTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), startMinute, 0, 0);
+    let endTime = new Date(startTime.getTime() + 2 * 60000);
+    return { startTime, endTime };
+}
+
+function tick() {
+    let now = new Date();
+    let { startTime, endTime } = getSessionTime(now);
+    let midTime = new Date(startTime.getTime() + 60000);
+
+    document.getElementById("session").innerText = 
+        "🧠 PHIÊN: " + 
+        startTime.toTimeString().slice(0,5) + " - " + 
+        endTime.toTimeString().slice(0,5);
+
+    if (now < midTime) {
+        let timeLeft = Math.floor((midTime - now) / 1000);
+        document.getElementById("countdown").innerText = "⏳ CÒN: 00:" + String(timeLeft).padStart(2, "0");
+
+        document.getElementById("end").style.display = "none";
+        document.getElementById("next").style.display = "none";
+
+        let analysisEnd = new Date(startTime.getTime() + analysisDuration * 1000);
+
+        if (now < analysisEnd) {
+            document.getElementById("wait").style.display = "block";
+            document.getElementById("result").style.display = "none";
+            resultShown = false;
+        } else {
+            document.getElementById("wait").style.display = "none";
+            if (!resultShown) {
+                let result = Math.random() < 0.5 ? "🔼 MUA" : "🔽 BÁN";
+                let color = result.includes("MUA") ? "#00ff99" : "#ff3333";
+                let resElem = document.getElementById("result");
+                resElem.innerText = result;
+                resElem.style.color = color;
+                resElem.style.display = "block";
+                resultShown = true;
+            }
+        }
+    } else {
+        document.getElementById("result").style.display = "none";
+        document.getElementById("wait").style.display = "none";
+        document.getElementById("end").style.display = "block";
+        document.getElementById("next").style.display = "block";
+        let timeLeft = Math.floor((endTime - now) / 1000);
+        document.getElementById("countdown").innerText = "🌀 PHIÊN MỚI SAU: " + timeLeft + "s";
+
+        resultShown = false;
+        analysisDuration = Math.floor(Math.random() * (24 - 15 + 1)) + 15;
+    }
+
+    setTimeout(tick, 1000);
+}
+
+tick();
+</script>
+</body>
+</html>
